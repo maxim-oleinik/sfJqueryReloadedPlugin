@@ -324,11 +324,9 @@ function jq_remote_function($options)
   // Is it a link with csrf protection
   elseif(isset($options['csrf']) && $options['csrf'] == '1')
   {
-    $form = new sfForm();
-      if ($form->isCSRFProtected())
-      {
-        $formData = '{'.$form->getCSRFFieldName().': \''.$form->getCSRFToken().'\'}';
-      }
+    if ($data = jQueryHelper_getCsrfData()) {
+      $formData = sprintf("{%s: '%s'}", $data[0], $data[1]);
+    }
   }
 
   // build the function
@@ -592,7 +590,7 @@ function jq_submit_image_to_remote($name, $source, $options = array(), $options_
  *
  * Added by tom@punkave.com.
  */
-function jq_sortable_element($selector, $options = array())
+function jq_sortable_element($selector, array $options = array(), array $sortable = array())
 {
   // We need ui for this trick. It's now just ui, not sortable; for simplicity
   // we have a catch-all ui package, which is minimized to contain only the
@@ -600,28 +598,31 @@ function jq_sortable_element($selector, $options = array())
   // or more features, from jQuery ui then get your own minimized package download
   // from the jquery ui site
   jq_add_plugins_by_name(array("ui"));
+
   $options = _parse_attributes($options);
-  $options['url'] = url_for($options['url']);
+  $options['url']  = url_for($options['url']);
   $options['type'] = 'POST';
-  $selector = json_encode($selector);
-  $options = json_encode($options);
+  $selector  = json_encode($selector);
+  $options   = json_encode($options);
+  $sortable  = json_encode($sortable);
+  $csrf      = implode('=', jQueryHelper_getCsrfData());
 
   $result = <<<EOM
 $(document).ready(
   function()
   {
-    $($selector).sortable(
+    var sortableOptions = {$sortable};
+    sortableOptions.update = function(e, ui)
     {
-      update: function(e, ui)
-      {
-        var serial = jQuery($selector).sortable('serialize', {});
-        var options = $options;
-        options['data'] = serial;
+        var serial = jQuery({$selector}).sortable('serialize');
+        var options = {$options};
+        options['data'] = serial+'&{$csrf}';
         $.ajax(options);
-      }
-    } );
+    }
+    $({$selector}).sortable(sortableOptions);
   });
 EOM;
+
   return javascript_tag($result);
 }
 
@@ -847,4 +848,22 @@ function _options_for_javascript($options)
   sort($opts);
 
   return '{'.join(', ', $opts).'}';
+}
+
+
+/**
+ * Get CSRF data as array
+ *
+ * Returns empty array if CSRF is disabled
+ *
+ * @return array (csrf_filed, csrf_token)
+ */
+function jQueryHelper_getCsrfData()
+{
+    $form = new BaseForm();
+    if ($form->isCSRFProtected())
+    {
+      return array($form->getCSRFFieldName(), $form->getCSRFToken());
+    }
+    return array();
 }
