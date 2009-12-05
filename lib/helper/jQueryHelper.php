@@ -852,6 +852,42 @@ function _options_for_javascript($options)
 
 
 /**
+ * In place editor
+ *
+ * @see http://www.appelsiini.net/projects/jeditable
+ *
+ * @param string $name    - id of field that can be edited
+ * @param string $url     - URL of module/action to be called when ok is clicked
+ * @param sfForm $form    - Form has to be submitted
+ * @param array  $options - plugin options
+ *
+ * @return string
+ */
+function input_in_place_editor_tag($name, $url, sfForm $form, array $options = array())
+{
+  $options = array_merge(array(
+    'onblur' => 'submit',
+  ), $options);
+
+  if (!empty($options['field'])) {
+    $options['name'] = $form->getWidgetSchema()->generateName($options['field']);
+    unset($options['field']);
+  } else {
+    throw new Exception(__FUNCTION__.": Expected option `field` - form field name to submit");
+  }
+
+  if ($form->isCSRFProtected()) {
+    $options['submitdata'] = array(
+      $form->getWidgetSchema()->generateName($form->getCSRFFieldName()) => $form->getCsrfToken()
+    );
+  }
+
+  $options = json_encode($options);
+  return javascript_tag("jQuery('{$name}').editable('{$url}', {$options});");
+}
+
+
+/**
  * Get CSRF data as array
  *
  * Returns empty array if CSRF is disabled
