@@ -324,6 +324,7 @@ function jq_remote_function($options)
   if ((isset($options['type'])) && ($options['type'] == 'synchronous')) $type = 'false';
 
   // Is it a form submitting
+  $postData = array();
   if (isset($options['form'])) $formData = 'jQuery(this).serialize()';
   elseif (isset($options['submit'])) $formData = '{\'#'.$options['submit'].'\'}.serialize()';
   // boutell and JoeZ99: 'with' should not be quoted, it's not useful
@@ -333,9 +334,16 @@ function jq_remote_function($options)
   elseif(isset($options['csrf']) && $options['csrf'] == '1')
   {
     if ($data = jQueryHelper_getCsrfData()) {
-      $formData = sprintf("{%s: '%s'}", $data[0], $data[1]);
+      $postData[$data[0]] = $data[1];
     }
   }
+  if (!empty($options['sf_method'])) {
+    $postData['sf_method'] = $options['sf_method'];
+  }
+  if ($postData) {
+    $formData = json_encode($postData);
+  }
+
 
   // build the function
   $function = "jQuery.ajax({";
@@ -884,10 +892,9 @@ function input_in_place_editor_tag($name, $url, sfForm $form, array $options = a
     throw new Exception(__FUNCTION__.": Expected option `field` - form field name to submit");
   }
 
+  $options['submitdata'] = array('sf_method' => 'put');
   if ($form->isCSRFProtected()) {
-    $options['submitdata'] = array(
-      $form->getWidgetSchema()->generateName($form->getCSRFFieldName()) => $form->getCsrfToken()
-    );
+    $options['submitdata'][$form->getWidgetSchema()->generateName($form->getCSRFFieldName())] = $form->getCsrfToken();
   }
 
   $options = json_encode($options);
