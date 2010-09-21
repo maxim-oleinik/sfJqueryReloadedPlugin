@@ -47,8 +47,8 @@ function jq_add_plugins_by_name($args = array()) {
 
   $plugins = array(
     // Backwards compatibility
-    'sortable' => 'jquery-ui-1.7.2.custom.min.js',
-    'ui' => 'jquery-ui-1.7.2.custom.min.js',
+    'sortable' => 'jquery-ui-1.7.3.custom.min.js',
+    'ui' => 'jquery-ui-1.7.3.custom.min.js',
     'autocomplete' => 'jquery.autocomplete.min.js'
   );
 
@@ -560,7 +560,7 @@ function jq_submit_image_to_remote($name, $source, $options = array(), $options_
 	}
 
 	$options_html['type'] = 'image';
-	$options_html['onclick'] = jq_remote_function($options).' return false;';
+	$options_html['onclick'] = jq_remote_function($options).'; return false;';
 	$options_html['name'] = $name;
 	$options_html['src'] = image_path($source);
 
