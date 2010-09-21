@@ -879,7 +879,7 @@ function _options_for_javascript($options)
  *
  * @return string
  */
-function input_in_place_editor_tag($name, $url, sfForm $form, array $options = array())
+function jq_input_in_place_editor_tag($name, $url, sfForm $form, array $options = array())
 {
   $options = array_merge(array(
     'onblur' => 'submit',
