@@ -47,8 +47,8 @@ function jq_add_plugins_by_name($args = array()) {
 
   $plugins = array(
     // Backwards compatibility
-    'sortable' => 'jquery-ui-1.7.2.custom.min.js',
-    'ui' => 'jquery-ui-1.7.2.custom.min.js',
+    'sortable' => 'jquery-ui-1.7.3.custom.min.js',
+    'ui' => 'jquery-ui-1.7.3.custom.min.js',
     'autocomplete' => 'jquery.autocomplete.min.js'
   );
 
@@ -557,29 +557,29 @@ function jq_submit_to_remote($name, $value, $options = array(), $options_html = 
  */
 function jq_submit_image_to_remote($name, $source, $options = array(), $options_html = array())
 {
-  $options = _parse_attributes($options);
-  $options_html = _parse_attributes($options_html);
+	$options = _parse_attributes($options);
+	$options_html = _parse_attributes($options_html);
 
-  if (!isset($options['with']))
-  {
-    $options['with'] = 'jQuery(this.form.elements).serialize()';
-  }
+	if (!isset($options['with']))
+	{
+		$options['with'] = 'jQuery(this.form.elements).serialize()';
+	}
 
-  $options_html['type'] = 'image';
-  $options_html['onclick'] = jq_remote_function($options).' return false;';
-  $options_html['name'] = $name;
-  $options_html['src'] = image_path($source);
+	$options_html['type'] = 'image';
+	$options_html['onclick'] = jq_remote_function($options).'; return false;';
+	$options_html['name'] = $name;
+	$options_html['src'] = image_path($source);
 
-  if (!isset($options_html['alt']))
-  {
-    $path_pos = strrpos($source, '/');
-    $dot_pos = strrpos($source, '.');
-    $begin = $path_pos ? $path_pos + 1 : 0;
-    $nb_str = ($dot_pos ? $dot_pos : strlen($source)) - $begin;
-    $options_html['alt'] = ucfirst(substr($source, $begin, $nb_str));
-  }
+	if (!isset($options_html['alt']))
+	{
+		$path_pos = strrpos($source, '/');
+		$dot_pos = strrpos($source, '.');
+		$begin = $path_pos ? $path_pos + 1 : 0;
+		$nb_str = ($dot_pos ? $dot_pos : strlen($source)) - $begin;
+		$options_html['alt'] = ucfirst(substr($source, $begin, $nb_str));
+	}
 
-  return tag('input', $options_html, false);
+	return tag('input', $options_html, false);
 }
 
 /**
