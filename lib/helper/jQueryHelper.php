@@ -49,7 +49,8 @@ function jq_add_plugins_by_name($args = array()) {
     // Backwards compatibility
     'sortable' => 'jquery-ui-1.7.3.custom.min.js',
     'ui' => 'jquery-ui-1.7.3.custom.min.js',
-    'autocomplete' => 'jquery.autocomplete.min.js'
+    'autocomplete' => 'jquery.autocomplete.min.js',
+    'editable' => 'jquery.jeditable.mini.js',
   );
 
   $pluginPaths = sfConfig::get('sf_jquery_plugin_paths');
@@ -881,6 +882,8 @@ function _options_for_javascript($options)
  */
 function jq_input_in_place_editor_tag($name, $url, sfForm $form, array $options = array())
 {
+  jq_add_plugins_by_name(array("editable"));
+
   $options = array_merge(array(
     'onblur' => 'submit',
   ), $options);
